@@ -1,3 +1,5 @@
+- [v1.6.3](#v1.6.3)
+- [v1.6.2](#v1.6.2)
 - [v1.6.1](#v1.6.1)
 - [v1.6.0](#v1.6.0)
 - [v1.5.2](#v1.5.2)
@@ -16,6 +18,23 @@
 - [v1.1.0](#v1.1.0)
 - [v1.0.0](#v1.0.0)
 
+## v1.6.3
+
+**Improvements/Fixes**
+
+- Add support for `%(thread_name)` in PatternFormatter. ([#97](https://github.com/odygrd/quill/issues/97))
+- Add missing header needed for recent versions of fmt. ([#95](https://github.com/odygrd/quill/issues/95))
+- Force flush all active handlers on application exit.
+
+## v1.6.2
+
+**Fixes**
+
+- Fix WIN32 compilation error when `NOMINMAX` is already defined.
+- Fix `string` to `wstring` MinGW conversion. ([#92](https://github.com/odygrd/quill/issues/92))
+- Log enums via the main queue. ([#90](https://github.com/odygrd/quill/issues/90))
+- Fix windows compiler error when `min/max` macros are defined. ([#94](https://github.com/odygrd/quill/issues/94))
+
 ## v1.6.1
 
 **Improvements/Fixes**
@@ -28,10 +47,8 @@
 
 **New Features**
 
-- Dual queue mode offering even lower latencies on hot paths.
-  See [Dual Queue Mode](https://github.com/odygrd/quill/wiki/9.-Dual-Queue-Mode).
-- Added a signal handler for linux and windows. The signal handler flushes the log when the app crashes or
-  exits. ([#1](https://github.com/odygrd/quill/issues/1))
+- Dual queue mode offering even lower latencies on hot paths. See [Dual Queue Mode](https://github.com/odygrd/quill/wiki/9.-Dual-Queue-Mode).
+- Added a signal handler for linux and windows. The signal handler flushes the log when the app crashes or exits. ([#1](https://github.com/odygrd/quill/issues/1))
 - Added support for custom handlers. ([#75](https://github.com/odygrd/quill/issues/75))
 - Quill now compiles and runs on Cygwin.
 

@@ -107,7 +107,7 @@ private:
   QUILL_ATTRIBUTE_HOT inline void _main_loop();
 
   /**
-   * Logging thread exist function that flushes everything after stop() is called
+   * Logging thread exit function that flushes everything after stop() is called
    */
   QUILL_ATTRIBUTE_COLD inline void _exit();
 
@@ -256,7 +256,7 @@ void BackendWorker::run()
       QUILL_TRY
       {
         // On Start
-        if (_config.backend_thread_cpu_affinity() != (std::numeric_limits<uint16_t>::max()))
+        if (_config.backend_thread_cpu_affinity() != (std::numeric_limits<uint16_t>::max)())
         {
           // Set cpu affinity if requested to cpu _backend_thread_cpu_affinity
           set_cpu_affinity(_config.backend_thread_cpu_affinity());
@@ -434,9 +434,9 @@ void BackendWorker::_process_transit_event()
     if (transit_event.base_event)
     {
       // This is a transit event coming from the generic_spsc_event_queue
-      transit_event.base_event->backend_process(_backtrace_log_record_storage,
-                                                transit_event.thread_context->thread_id(),
-                                                obtain_active_handlers, get_real_ts);
+      transit_event.base_event->backend_process(
+        _backtrace_log_record_storage, transit_event.thread_context->thread_id(),
+        transit_event.thread_context->thread_name(), obtain_active_handlers, get_real_ts);
     }
     else
     {
@@ -456,7 +456,8 @@ void BackendWorker::_process_transit_event()
       for (auto& handler : transit_event.logger_details->handlers())
       {
         handler->formatter().format(
-          timestamp, transit_event.thread_context->thread_id(), transit_event.logger_details->name(),
+          timestamp, transit_event.thread_context->thread_id(),
+          transit_event.thread_context->thread_name(), transit_event.logger_details->name(),
           transit_event.serialization_metadata->log_macro_metadata, transit_event.fmt_store);
 
         // After calling format on the formatter we have to request the formatter record
@@ -489,11 +490,11 @@ void BackendWorker::_process_transit_event()
         // we only use the handlers of the logger, but we just have to pass it because of the API
         _backtrace_log_record_storage.process(
           transit_event.logger_details->name(),
-          [&obtain_active_handlers, &get_real_ts](std::string const& stored_thread_id,
+          [&obtain_active_handlers, &get_real_ts](std::string const& stored_thread_id, std::string const& stored_thread_name,
                                                   BaseEvent const* stored_backtrace_log_record) {
             // call backend process on each stored record
             stored_backtrace_log_record->backend_process_backtrace_log_record(
-              stored_thread_id.data(), obtain_active_handlers, get_real_ts);
+              stored_thread_id.data(), stored_thread_name.data(), obtain_active_handlers, get_real_ts);
           });
       }
     }
@@ -610,8 +611,7 @@ void BackendWorker::_exit()
     else
     {
       _check_dropped_messages(cached_thread_contexts);
-
-      // keep going until there are no events are found
+      _force_flush();
       break;
     }
   }
